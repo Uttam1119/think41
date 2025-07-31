@@ -181,6 +181,59 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   }
 });
 
+app.get('/api/departments', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT d.id, d.name, COUNT(p.id) AS product_count
+      FROM departments d
+      LEFT JOIN products p ON d.id = p.department_id
+      GROUP BY d.id, d.name
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error fetching departments:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+app.get('/api/departments/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query('SELECT * FROM departments WHERE id = $1', [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Department not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('Error fetching department by ID:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+app.get('/api/departments/:id/products', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(
+      `
+      SELECT p.id, p.name, p.brand, p.retail_price, p.cost, p.sku, p.category, d.name AS department_name
+      FROM products p
+      JOIN departments d ON p.department_id = d.id
+      WHERE d.id = $1
+    `
+      [id]
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error fetching products for department:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Start server
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
