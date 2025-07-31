@@ -104,7 +104,18 @@ app.use(express.json());
 // Routes
 app.get('/api/products', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM products LIMIT 100'); // Add pagination later
+    const result = await pool.query(`SELECT 
+        p.id,
+        p.name,
+        p.brand,
+        p.retail_price,
+        p.cost,
+        p.sku,
+        p.category,
+        p.distribution_center_id,
+        d.name AS department
+      FROM products p
+      LEFT JOIN departments d ON p.department_id = d.id`); // Add pagination later
     res.json(result.rows);
   } catch (err) {
     console.error('Error fetching products:', err);
