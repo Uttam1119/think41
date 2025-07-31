@@ -184,12 +184,16 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 app.get('/api/departments', async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT d.id, d.name, COUNT(p.id) AS product_count
+      ELECT 
+        d.id, 
+        d.name, 
+        COUNT(p.id) AS product_count
       FROM departments d
       LEFT JOIN products p ON d.id = p.department_id
       GROUP BY d.id, d.name
+
     `);
-    res.json(result.rows);
+    res.json({ departments: result.rows });
   } catch (err) {
     console.error('Error fetching departments:', err);
     res.status(500).json({ error: 'Internal server error' });
@@ -219,15 +223,31 @@ app.get('/api/departments/:id/products', async (req, res) => {
     const { id } = req.params;
     const result = await pool.query(
       `
-      SELECT p.id, p.name, p.brand, p.retail_price, p.cost, p.sku, p.category, d.name AS department_name
-      FROM products p
-      JOIN departments d ON p.department_id = d.id
-      WHERE d.id = $1
+      SELECT 
+  d.name AS department,
+  COALESCE(json_agg(
+    json_build_object(
+      'id', p.id,
+      'name', p.name,
+      'brand', p.brand,
+      'retail_price', p.retail_price,
+      'cost', p.cost,
+      'sku', p.sku,
+      'category', p.category,
+      'distribution_center_id', p.distribution_center_id
+    )
+  ) FILTER (WHERE p.id IS NOT NULL), '[]') AS products
+FROM departments d
+LEFT JOIN products p ON d.id = p.department_id
+WHERE d.id = id
+GROUP BY d.name;
+
+
     `
       [id]
     );
 
-    res.json(result.rows);
+    res.json({ products: result.rows });
   } catch (err) {
     console.error('Error fetching products for department:', err);
     res.status(500).json({ error: 'Internal server error' });
