@@ -16,16 +16,16 @@ This is a full-stack e-commerce application built using:
 
 ## 📁 Folder Structure
 
-```
+
 
 /backend         → Express + PostgreSQL logic
 /frontend-tree        → React UI
 /backend/products.csv    → Product data to import
 /backend/.env            → Environment variables
 
-````
 
----
+
+
 
 ## ⚙️ Setup Instructions
 
