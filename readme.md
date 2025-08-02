@@ -19,7 +19,7 @@ This is a full-stack e-commerce application built using:
 ```
 
 /backend         → Express + PostgreSQL logic
-/frontend        → React UI
+/frontend-tree        → React UI
 /backend/products.csv    → Product data to import
 /backend/.env            → Environment variables
 
@@ -105,7 +105,7 @@ Your backend will run on [http://localhost:5000](http://localhost:5000)
 ### 3. Frontend Setup
 
 ```bash
-cd ../frontend
+cd ../frontend-tree
 npm install
 npm start
 ```
