@@ -1,8 +1,4 @@
-Sure! Here's your complete `README.md` content, formatted so you can copy it in one go:
 
----
-
-```markdown
 # 🛒 Full-Stack E-Commerce App
 
 This is a full-stack e-commerce application built using:
